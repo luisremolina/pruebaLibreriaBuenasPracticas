@@ -17,7 +17,7 @@ public class PrestamoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_prestamo")
-    private Integer idPrestamo;
+    private int idPrestamo;
 
     @Column(name = "id_usuario", length = 10)
     private String idUsuario;
@@ -32,24 +32,27 @@ public class PrestamoEntity {
 
     private LocalDate fechaDevolucion;
 
+    private String fechaDevolucionString;
+
     public PrestamoEntity() {
     }
-    public PrestamoEntity(String idUsuario, String idLibro, int tipoUsuario, LocalDate fechaPrestamo, LocalDate fechaDevolucion) {
+    public PrestamoEntity(String idUsuario, String idLibro, int tipoUsuario, LocalDate fechaPrestamo, LocalDate fechaDevolucion, String fechaDevolucionString) {
 //        this.idPrestamo = idPrestamo;
         this.idUsuario = idUsuario;
         this.idLibro = idLibro;
         this.tipoUsuario = tipoUsuario;
         this.fechaPrestamo = fechaPrestamo;
         this.fechaDevolucion = fechaDevolucion;
+        this.fechaDevolucionString = fechaDevolucionString;
     }
 
 
 
-    public Integer getIdPrestamo() {
-        return idPrestamo;
+    public int getIdPrestamo() {
+        return this.idPrestamo;
     }
 
-    public void setIdPrestamo(Integer idPrestamo) {
+    public void setIdPrestamo(int idPrestamo) {
         this.idPrestamo = idPrestamo;
     }
 
@@ -91,5 +94,13 @@ public class PrestamoEntity {
 
     public void setFechaDevolucion(LocalDate fechaDevolucion) {
         this.fechaDevolucion = fechaDevolucion;
+    }
+
+    public String getFechaDevolucionString() {
+        return fechaDevolucionString;
+    }
+
+    public void setFechaDevolucionString(String fechaDevolucionString) {
+        this.fechaDevolucionString = fechaDevolucionString;
     }
 }

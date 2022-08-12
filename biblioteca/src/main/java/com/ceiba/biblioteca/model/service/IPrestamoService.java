@@ -1,11 +1,14 @@
 package com.ceiba.biblioteca.model.service;
 
+import com.ceiba.biblioteca.model.dto.BuscarRegistroDTO;
 import com.ceiba.biblioteca.model.dto.RegistroDTO;
-import com.ceiba.biblioteca.model.dto.RespuestaDTO;
+import org.springframework.http.ResponseEntity;
+
+import java.util.HashMap;
 
 public interface IPrestamoService {
-    RespuestaDTO guardarPrestamo(RegistroDTO RegistroDTO);
+    ResponseEntity<HashMap<String, String>> guardarPrestamo(RegistroDTO RegistroDTO);
 
     boolean findByIdPrestamo (String idUsuario);
-    int countPrestados();
+    BuscarRegistroDTO findRegister(int id);
 }
