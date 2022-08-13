@@ -18,7 +18,6 @@ import java.util.*;
 public class PrestamoServiceImpl implements  IPrestamoService{
     @Autowired
     PrestamoRepository prestamoRepository;
-
     @Override
     public ResponseEntity<HashMap<String, String>> registrarPrestamo(RegistroDTO registroDTO) {
 
@@ -45,7 +44,6 @@ public class PrestamoServiceImpl implements  IPrestamoService{
         tipoUsuarioMap.put(2,8);
         tipoUsuarioMap.put(3,7);
 
-        LocalDate fechaActual = LocalDate.now();
         LocalDate fechaDevolucion = LocalDate.now().plusDays(contarDiasHabiles(tipoUsuarioMap.get(tipoUsuario)));
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -53,7 +51,6 @@ public class PrestamoServiceImpl implements  IPrestamoService{
         PrestamoEntity prestamoEntity = new PrestamoEntity(
                 identificacionUsuario,
                 registroDTO.getIsbn(),registroDTO.getTipoUsuario(),
-                fechaActual,
                 fechaDevolucion,
                 fecha
         );
@@ -62,12 +59,10 @@ public class PrestamoServiceImpl implements  IPrestamoService{
         respuestaServidor.put("id",  String.valueOf(pres.get().getIdPrestamo()));
         respuestaServidor.put("fechaMaximaDevolucion",  pres.get().getFechaDevolucionString());
         return ResponseEntity.ok(respuestaServidor);
-
     }
 
     @Override
     public boolean usuarioTienePrestamo(String identificacionUsuario) {
-        //List<PrestamoEntity> listaPrestamos = new ArrayList<>();
         List<PrestamoEntity> listaPrestamos;
         listaPrestamos = prestamoRepository.findAll();
         for (PrestamoEntity prestamo: listaPrestamos ) {
@@ -76,15 +71,7 @@ public class PrestamoServiceImpl implements  IPrestamoService{
             }
         }
         return false;
-        /*for (int i = 0; i < lista.size(); i++) {
-            System.out.println("ID EN LA TABLA: "+ lista.get(i).getIdUsuario());
-            if(lista.get(i).getIdUsuario().equals(identificacionUsuario)){
-                return true;
-            }
-        }*/
-
     }
-
     @Override
     public BuscarRegistroDTO buscarPrestamo(int id) {
         Optional<PrestamoEntity> data = prestamoRepository.findById(id);
@@ -95,7 +82,7 @@ public class PrestamoServiceImpl implements  IPrestamoService{
                     data.get().getTipoUsuario(),
                     data.get().getFechaDevolucionString());
         }
-        return new BuscarRegistroDTO();
+        return new BuscarRegistroDTO(1,"Clean Code","1010122859",1,data.get().getFechaDevolucionString());
     }
 
     public int contarDiasHabiles(int fin){
@@ -114,7 +101,4 @@ public class PrestamoServiceImpl implements  IPrestamoService{
     public boolean validarTipoUsuarioValido(int tipoUsuario){
         return !(tipoUsuario > 3 || tipoUsuario < 1);
     }
-
-
-
 }

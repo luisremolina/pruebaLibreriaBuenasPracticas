@@ -10,8 +10,8 @@ public class BuscarRegistroDTO {
     private Integer tipoUsuario;
     private String fechaMaximaDevolucion;
 
-    public BuscarRegistroDTO() {
-    }
+    //public BuscarRegistroDTO() {
+    //}
 
     public BuscarRegistroDTO(int id, String isbn, String identificacionUsuario, Integer tipoUsuario, String fechaMaximaDevolucion) {
         this.id = id;

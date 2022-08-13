@@ -27,26 +27,19 @@ public class PrestamoEntity {
 
     @Column(name = "tipo_usuario")
     private int tipoUsuario;
-
-    private LocalDate fechaPrestamo;
-
     private LocalDate fechaDevolucion;
 
     private String fechaDevolucionString;
 
     public PrestamoEntity() {
     }
-    public PrestamoEntity(String idUsuario, String idLibro, int tipoUsuario, LocalDate fechaPrestamo, LocalDate fechaDevolucion, String fechaDevolucionString) {
-//        this.idPrestamo = idPrestamo;
+    public PrestamoEntity(String idUsuario, String idLibro, int tipoUsuario, LocalDate fechaDevolucion, String fechaDevolucionString) {
         this.idUsuario = idUsuario;
         this.idLibro = idLibro;
         this.tipoUsuario = tipoUsuario;
-        this.fechaPrestamo = fechaPrestamo;
         this.fechaDevolucion = fechaDevolucion;
         this.fechaDevolucionString = fechaDevolucionString;
     }
-
-
 
     public int getIdPrestamo() {
         return this.idPrestamo;
@@ -79,15 +72,6 @@ public class PrestamoEntity {
     public void setTipoUsuario(int tipoUsuario) {
         this.tipoUsuario = tipoUsuario;
     }
-
-    public LocalDate getFechaPrestamo() {
-        return fechaPrestamo;
-    }
-
-    public void setFechaPrestamo(LocalDate fechaPrestamo) {
-        this.fechaPrestamo = fechaPrestamo;
-    }
-
     public LocalDate getFechaDevolucion() {
         return fechaDevolucion;
     }
