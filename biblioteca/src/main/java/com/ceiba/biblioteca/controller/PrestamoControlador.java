@@ -19,18 +19,18 @@ public class PrestamoControlador {
     @Autowired
     IPrestamoService iPrestamoService;
 
-    @Autowired
-    PrestamoRepository prestamoRepository;
+    //@Autowired
+    //PrestamoRepository prestamoRepository;
 
     @GetMapping("/{id-prestamo}")
-    public BuscarRegistroDTO buscarRegistro (@PathVariable(name="id-prestamo") int idPrestamo) {
-        return iPrestamoService.findRegister(idPrestamo);
+    public BuscarRegistroDTO buscarPrestamo (@PathVariable(name="id-prestamo") int idPrestamo) {
+        return iPrestamoService.buscarPrestamo(idPrestamo);
     }
 
     @PostMapping
     @ResponseBody
     public ResponseEntity<HashMap<String, String>> registrarPrestamo(@RequestBody RegistroDTO registroDto){
-        return iPrestamoService.guardarPrestamo(registroDto);
+        return iPrestamoService.registrarPrestamo(registroDto);
     }
 }
 

@@ -9,93 +9,84 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
 import java.util.*;
 
 @Service
 public class PrestamoServiceImpl implements  IPrestamoService{
-
     @Autowired
     PrestamoRepository prestamoRepository;
 
     @Override
-    public ResponseEntity<HashMap<String, String>> guardarPrestamo(RegistroDTO registroDTO) {
-        int tipoUsuario = registroDTO.getTipoUsuario();
-        String idUser = registroDTO.getIdentificacionUsuario();
+    public ResponseEntity<HashMap<String, String>> registrarPrestamo(RegistroDTO registroDTO) {
 
-        if(tipoUsuario > 3 || tipoUsuario < 1){
-            HashMap<String, String> map = new HashMap<String, String>();
-            map.put("mensaje",  "Tipo de usuario no permitido en la biblioteca");
-            return new ResponseEntity<>(
-                    map,
-                    HttpStatus.BAD_REQUEST
-            );
+        int tipoUsuario = registroDTO.getTipoUsuario(); // Obtenemos que tipo de usuario llega del body 1-2-3
+        String identificacionUsuario = registroDTO.getIdentificacionUsuario();
+        HashMap<String, String> respuestaServidor = new HashMap<String, String>();
+
+        if (!validarTipoUsuarioValido(tipoUsuario)){ // usamos el operador '!' para indicar cuando el usuario sea invalido
+            respuestaServidor.put("mensaje",  "Tipo de usuario no permitido en la biblioteca");
+            return new ResponseEntity<>( respuestaServidor, HttpStatus.BAD_REQUEST );
         }
+
         if(tipoUsuario == 3){
-            if(findByIdPrestamo(idUser)){
-                HashMap<String, String> map = new HashMap<String, String>();
-                String message = "El usuario con identificación "+idUser+" ya tiene un libro prestado por lo cual no se le puede realizar otro préstamo";
-                map.put("mensaje",  message);
-                return new ResponseEntity<>(
-                        map,
-                        HttpStatus.BAD_REQUEST
-                );
+            if(usuarioTienePrestamo(identificacionUsuario)){ // Validamos que el usuario invitado tenga una prestamo activo
+                String message = "El usuario con identificación "+identificacionUsuario+" ya tiene un libro prestado por lo cual no se le puede realizar otro préstamo";
+                respuestaServidor.put("mensaje",  message);
+                return new ResponseEntity<>( respuestaServidor, HttpStatus.BAD_REQUEST );
             }
         }
+        // con esto sabremos cuantos dias habiles tiene cada tipo de usuario
+        // Si el usuario es tipo 1 devolvera 10, si es tipo 2 devolvera 8 y asi en caso de tener mas usuarios sera mas facil validar
+        HashMap<Integer, Integer> tipoUsuarioMap = new HashMap<Integer, Integer>();
+        tipoUsuarioMap.put(1,10);
+        tipoUsuarioMap.put(2,8);
+        tipoUsuarioMap.put(3,7);
 
         LocalDate fechaActual = LocalDate.now();
-        LocalDate fechaDevolucion;
-        if(tipoUsuario == 1){
-            fechaDevolucion = LocalDate.now().plusDays(contarDiasHabiles(10));
-        }else if(tipoUsuario == 2){
-            fechaDevolucion = LocalDate.now().plusDays(contarDiasHabiles(8));
-        }else {
-            fechaDevolucion = LocalDate.now().plusDays(contarDiasHabiles(7));
-        }
+        LocalDate fechaDevolucion = LocalDate.now().plusDays(contarDiasHabiles(tipoUsuarioMap.get(tipoUsuario)));
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
         String fecha = formatter.format(fechaDevolucion);
-
-        PrestamoEntity responseData = new PrestamoEntity(
-                idUser,
+        PrestamoEntity prestamoEntity = new PrestamoEntity(
+                identificacionUsuario,
                 registroDTO.getIsbn(),registroDTO.getTipoUsuario(),
                 fechaActual,
                 fechaDevolucion,
                 fecha
         );
-
-        prestamoRepository.save(responseData);
-        Optional<PrestamoEntity> pres = prestamoRepository.findById(responseData.getIdPrestamo());
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put("id",  String.valueOf(pres.get().getIdPrestamo()));
-        map.put("fechaMaximaDevolucion",  pres.get().getFechaDevolucionString());
-        return ResponseEntity.ok(map);
+        prestamoRepository.save(prestamoEntity);
+        Optional<PrestamoEntity> pres = prestamoRepository.findById(prestamoEntity.getIdPrestamo());
+        respuestaServidor.put("id",  String.valueOf(pres.get().getIdPrestamo()));
+        respuestaServidor.put("fechaMaximaDevolucion",  pres.get().getFechaDevolucionString());
+        return ResponseEntity.ok(respuestaServidor);
 
     }
 
     @Override
-    public boolean findByIdPrestamo(String idUsuario) {
-        List<PrestamoEntity> lista = new ArrayList<>();
-        lista = prestamoRepository.findAll();
-        //System.out.println("tamaño de la lista: "+ lista.size());
-
-        for (int i = 0; i < lista.size(); i++) {
-            System.out.println("ID EN LA TABLA: "+ lista.get(i).getIdUsuario());
-            if(lista.get(i).getIdUsuario().equals(idUsuario)){
+    public boolean usuarioTienePrestamo(String identificacionUsuario) {
+        //List<PrestamoEntity> listaPrestamos = new ArrayList<>();
+        List<PrestamoEntity> listaPrestamos;
+        listaPrestamos = prestamoRepository.findAll();
+        for (PrestamoEntity prestamo: listaPrestamos ) {
+            if (prestamo.getIdUsuario().equals(identificacionUsuario)){
                 return true;
             }
         }
         return false;
+        /*for (int i = 0; i < lista.size(); i++) {
+            System.out.println("ID EN LA TABLA: "+ lista.get(i).getIdUsuario());
+            if(lista.get(i).getIdUsuario().equals(identificacionUsuario)){
+                return true;
+            }
+        }*/
+
     }
 
     @Override
-    public BuscarRegistroDTO findRegister(int id) {
+    public BuscarRegistroDTO buscarPrestamo(int id) {
         Optional<PrestamoEntity> data = prestamoRepository.findById(id);
         if (data.isPresent()){
             return new BuscarRegistroDTO(data.get().getIdPrestamo(),
@@ -105,7 +96,6 @@ public class PrestamoServiceImpl implements  IPrestamoService{
                     data.get().getFechaDevolucionString());
         }
         return new BuscarRegistroDTO();
-
     }
 
     public int contarDiasHabiles(int fin){
@@ -113,17 +103,16 @@ public class PrestamoServiceImpl implements  IPrestamoService{
         int diasHabiles = fin;
         int daysToAdd = 0;
         for (int i = 0; i < diasHabiles; i++) {
-
             fechaActual = fechaActual.plusDays(1);
             if(fechaActual.getDayOfWeek().equals(DayOfWeek.SUNDAY) || fechaActual.getDayOfWeek().equals(DayOfWeek.SATURDAY) ){
                 diasHabiles++;
-                //System.out.println("Hoy es " + fechaActual.getDayOfWeek());
             }
             daysToAdd++;
-
         }
-        // System.out.println("DIAS HABILES "+diasHabiles);
         return diasHabiles;
+    }
+    public boolean validarTipoUsuarioValido(int tipoUsuario){
+        return !(tipoUsuario > 3 || tipoUsuario < 1);
     }
 
 

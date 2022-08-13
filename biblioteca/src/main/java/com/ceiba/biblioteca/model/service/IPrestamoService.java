@@ -7,8 +7,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.HashMap;
 
 public interface IPrestamoService {
-    ResponseEntity<HashMap<String, String>> guardarPrestamo(RegistroDTO RegistroDTO);
-
-    boolean findByIdPrestamo (String idUsuario);
-    BuscarRegistroDTO findRegister(int id);
+    ResponseEntity<HashMap<String, String>> registrarPrestamo(RegistroDTO RegistroDTO);
+    boolean usuarioTienePrestamo (String idUsuario);
+    BuscarRegistroDTO buscarPrestamo(int id);
 }
