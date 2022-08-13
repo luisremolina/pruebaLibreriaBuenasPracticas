@@ -74,15 +74,15 @@ public class PrestamoServiceImpl implements  IPrestamoService{
     }
     @Override
     public BuscarRegistroDTO buscarPrestamo(int id) {
-        Optional<PrestamoEntity> data = prestamoRepository.findById(id);
-        if (data.isPresent()){
-            return new BuscarRegistroDTO(data.get().getIdPrestamo(),
-                    data.get().getIdLibro(),
-                    data.get().getIdUsuario(),
-                    data.get().getTipoUsuario(),
-                    data.get().getFechaDevolucionString());
+        Optional<PrestamoEntity> prestamoEncontrado = prestamoRepository.findById(id);
+        if (prestamoEncontrado.isPresent()){
+            return new BuscarRegistroDTO(prestamoEncontrado.get().getIdPrestamo(),
+                    prestamoEncontrado.get().getIdLibro(),
+                    prestamoEncontrado.get().getIdUsuario(),
+                    prestamoEncontrado.get().getTipoUsuario(),
+                    prestamoEncontrado.get().getFechaDevolucionString());
         }
-        return new BuscarRegistroDTO(1,"Clean Code","1010122859",1,data.get().getFechaDevolucionString());
+        return new BuscarRegistroDTO(1,"Clean Code","1010122859",1,prestamoEncontrado.get().getFechaDevolucionString());
     }
 
     public int contarDiasHabiles(int fin){
